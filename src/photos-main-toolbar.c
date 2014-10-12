@@ -301,6 +301,7 @@ photos_main_toolbar_add_selection_button (PhotosMainToolbar *self)
   GtkWidget *selection_button;
 
   selection_button = gtk_button_new_from_icon_name (PHOTOS_ICON_OBJECT_SELECT_SYMBOLIC, GTK_ICON_SIZE_BUTTON);
+  gtk_widget_set_sensitive (selection_button, FALSE);
   gtk_widget_set_tooltip_text (selection_button, _("Select Items"));
   gtk_header_bar_pack_end (GTK_HEADER_BAR (priv->toolbar), selection_button);
   g_signal_connect_swapped (selection_button,
