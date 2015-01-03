@@ -1,6 +1,6 @@
 /*
  * Photos - access, organize and share your photos on GNOME
- * Copyright © 2014 Pranav Kant
+ * Copyright © 2014, 2015 Pranav Kant
  * Copyright © 2012, 2013, 2014 Red Hat, Inc.
  *
  * This program is free software; you can redistribute it and/or
@@ -54,6 +54,12 @@
 #include "photos-tracker-extract-priority.h"
 #include "photos-utils.h"
 
+#define WP_PATH_ID "org.gnome.desktop.background"
+#define WP_URI_KEY "picture-uri"
+#define WP_OPTIONS_KEY "picture-options"
+#define WP_SHADING_KEY "color-shading-type"
+#define WP_PCOLOR_KEY "primary-color"
+#define WP_SCOLOR_KEY "secondary-color"
 
 struct _PhotosApplicationPrivate
 {
@@ -508,11 +514,11 @@ photos_application_set_bg_download (GObject *source_object, GAsyncResult *res, g
     }
 
 
-  g_settings_set_string (priv->settings, "picture-uri", filename);
-  g_settings_set_enum (priv->settings, "picture-options", G_DESKTOP_BACKGROUND_STYLE_ZOOM);
-  g_settings_set_enum (priv->settings, "color-shading-type", G_DESKTOP_BACKGROUND_SHADING_SOLID);
-  g_settings_set_string (priv->settings, "primary-color", "#000000000000");
-  g_settings_set_string (priv->settings, "secondary-color", "#000000000000");
+  g_settings_set_string (priv->settings, WP_URI_KEY, filename);
+  g_settings_set_enum (priv->settings, WP_OPTIONS_KEY, G_DESKTOP_BACKGROUND_STYLE_ZOOM);
+  g_settings_set_enum (priv->settings, WP_SHADING_KEY, G_DESKTOP_BACKGROUND_SHADING_SOLID);
+  g_settings_set_string (priv->settings, WP_PCOLOR_KEY, "#000000000000");
+  g_settings_set_string (priv->settings, WP_SCOLOR_KEY, "#000000000000");
 
  out:
   g_free (filename);
@@ -812,7 +818,7 @@ photos_application_startup (GApplication *application)
       g_error_free (error);
     }
 
-  priv->settings = g_settings_new ("org.gnome.desktop.background");
+  priv->settings = g_settings_new (WP_PATH_ID);
 
   priv->resource = photos_get_resource ();
   g_resources_register (priv->resource);
