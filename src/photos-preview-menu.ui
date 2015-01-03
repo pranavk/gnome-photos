@@ -18,6 +18,10 @@
         <attribute name="action">app.set-desktop-background</attribute>
         <attribute name="label" translatable="yes">Set as Desktop Background</attribute>
       </item>
+      <item>
+        <attribute name="action">app.set-lock-background</attribute>
+        <attribute name="label" translatable="yes">Set as Lockscreen Background</attribute>
+      </item>
     </section>
     <section>
       <item>

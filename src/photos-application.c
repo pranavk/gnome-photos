@@ -55,6 +55,7 @@
 #include "photos-utils.h"
 
 #define WP_PATH_ID "org.gnome.desktop.background"
+#define WP_LOCK_PATH_ID "org.gnome.desktop.screensaver"
 #define WP_URI_KEY "picture-uri"
 #define WP_OPTIONS_KEY "picture-options"
 #define WP_SHADING_KEY "color-shading-type"
@@ -67,6 +68,8 @@ struct _PhotosApplicationPrivate
   GList *miners_running;
   GResource *resource;
   GSettings *settings;
+  GSettings *lock_settings;
+  GSettings *current_settings;
   GSimpleAction *fs_action;
   GSimpleAction *gear_action;
   GSimpleAction *open_action;
@@ -76,6 +79,7 @@ struct _PhotosApplicationPrivate
   GSimpleAction *sel_all_action;
   GSimpleAction *sel_none_action;
   GSimpleAction *set_desktop_bg_action;
+  GSimpleAction *set_lock_bg_action;
   GSimpleAction *remote_display_action;
   GtkWidget *main_window;
   PhotosCameraCache *camera_cache;
@@ -493,7 +497,7 @@ photos_application_quit (PhotosApplication *self, GVariant *parameter)
 
 
 static void
-photos_application_set_desktop_bg_download (GObject *source_object, GAsyncResult *res, gpointer user_data)
+photos_application_set_bg_download (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   PhotosApplication *self = PHOTOS_APPLICATION (user_data);
   PhotosApplicationPrivate *priv = self->priv;
@@ -513,12 +517,11 @@ photos_application_set_desktop_bg_download (GObject *source_object, GAsyncResult
       goto out;
     }
 
-
-  g_settings_set_string (priv->settings, WP_URI_KEY, filename);
-  g_settings_set_enum (priv->settings, WP_OPTIONS_KEY, G_DESKTOP_BACKGROUND_STYLE_ZOOM);
-  g_settings_set_enum (priv->settings, WP_SHADING_KEY, G_DESKTOP_BACKGROUND_SHADING_SOLID);
-  g_settings_set_string (priv->settings, WP_PCOLOR_KEY, "#000000000000");
-  g_settings_set_string (priv->settings, WP_SCOLOR_KEY, "#000000000000");
+  g_settings_set_string (priv->current_settings, WP_URI_KEY, filename);
+  g_settings_set_enum (priv->current_settings, WP_OPTIONS_KEY, G_DESKTOP_BACKGROUND_STYLE_ZOOM);
+  g_settings_set_enum (priv->current_settings, WP_SHADING_KEY, G_DESKTOP_BACKGROUND_SHADING_SOLID);
+  g_settings_set_string (priv->current_settings, WP_PCOLOR_KEY, "#000000000000");
+  g_settings_set_string (priv->current_settings, WP_SCOLOR_KEY, "#000000000000");
 
  out:
   g_free (filename);
@@ -527,15 +530,29 @@ photos_application_set_desktop_bg_download (GObject *source_object, GAsyncResult
 
 
 static void
-photos_application_set_desktop_bg (PhotosApplication *self)
+photos_application_set_bg (PhotosApplication *self,
+                           GVariant *parameter,
+                           gpointer user_data)
 {
+  PhotosApplicationPrivate *priv = self->priv;
   PhotosBaseItem *item;
+  const gchar *name;
+  GSimpleAction *action = G_SIMPLE_ACTION (user_data);
+
+  name = g_action_get_name (G_ACTION (action));
+  if (g_strcmp0 (name, "set-desktop-background") == 0){
+    priv->current_settings = priv->settings;
+  }
+  else if (g_strcmp0 (name, "set-lock-background") == 0)
+    priv->current_settings = priv->lock_settings;
+  else
+    return;
 
   item = PHOTOS_BASE_ITEM (photos_base_manager_get_active_object (self->priv->state->item_mngr));
   if (item == NULL)
     return;
 
-  photos_base_item_download_async (item, NULL, photos_application_set_desktop_bg_download, g_object_ref (self));
+  photos_base_item_download_async (item, NULL, photos_application_set_bg_download, g_object_ref (self));
 }
 
 
@@ -819,6 +836,7 @@ photos_application_startup (GApplication *application)
     }
 
   priv->settings = g_settings_new (WP_PATH_ID);
+  priv->lock_settings = g_settings_new (WP_LOCK_PATH_ID);
 
   priv->resource = photos_get_resource ();
   g_resources_register (priv->resource);
@@ -926,9 +944,13 @@ photos_application_startup (GApplication *application)
   g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (priv->sel_none_action));
 
   priv->set_desktop_bg_action = g_simple_action_new ("set-desktop-background", NULL);
-  g_signal_connect_swapped (priv->set_desktop_bg_action, "activate", G_CALLBACK (photos_application_set_desktop_bg), self);
+  g_signal_connect_swapped (priv->set_desktop_bg_action, "activate", G_CALLBACK (photos_application_set_bg), self);
   g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (priv->set_desktop_bg_action));
 
+  priv->set_lock_bg_action = g_simple_action_new ("set-lock-background", NULL);
+  g_signal_connect_swapped (priv->set_lock_bg_action, "activate", G_CALLBACK (photos_application_set_bg), self);
+  g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (priv->set_lock_bg_action));
+  
   g_signal_connect_swapped (priv->mode_cntrlr,
                             "window-mode-changed",
                             G_CALLBACK (photos_application_window_mode_changed),
@@ -988,6 +1010,8 @@ photos_application_dispose (GObject *object)
     }
 
   g_clear_object (&priv->settings);
+  g_clear_object (&priv->lock_settings);
+  g_clear_object (&priv->current_settings);
   g_clear_object (&priv->fs_action);
   g_clear_object (&priv->gear_action);
   g_clear_object (&priv->open_action);
