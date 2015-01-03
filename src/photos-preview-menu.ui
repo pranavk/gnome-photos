@@ -15,8 +15,8 @@
         <attribute name="label" translatable="yes">Display on…</attribute>
       </item>
       <item>
-        <attribute name="action">app.set-background</attribute>
-        <attribute name="label" translatable="yes">Set as Background</attribute>
+        <attribute name="action">app.set-desktop-background</attribute>
+        <attribute name="label" translatable="yes">Set as Desktop Background</attribute>
       </item>
     </section>
     <section>

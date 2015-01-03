@@ -75,7 +75,7 @@ struct _PhotosApplicationPrivate
   GSimpleAction *search_action;
   GSimpleAction *sel_all_action;
   GSimpleAction *sel_none_action;
-  GSimpleAction *set_bg_action;
+  GSimpleAction *set_desktop_bg_action;
   GSimpleAction *remote_display_action;
   GtkWidget *main_window;
   PhotosCameraCache *camera_cache;
@@ -493,7 +493,7 @@ photos_application_quit (PhotosApplication *self, GVariant *parameter)
 
 
 static void
-photos_application_set_bg_download (GObject *source_object, GAsyncResult *res, gpointer user_data)
+photos_application_set_desktop_bg_download (GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
   PhotosApplication *self = PHOTOS_APPLICATION (user_data);
   PhotosApplicationPrivate *priv = self->priv;
@@ -527,7 +527,7 @@ photos_application_set_bg_download (GObject *source_object, GAsyncResult *res, g
 
 
 static void
-photos_application_set_bg (PhotosApplication *self)
+photos_application_set_desktop_bg (PhotosApplication *self)
 {
   PhotosBaseItem *item;
 
@@ -535,7 +535,7 @@ photos_application_set_bg (PhotosApplication *self)
   if (item == NULL)
     return;
 
-  photos_base_item_download_async (item, NULL, photos_application_set_bg_download, g_object_ref (self));
+  photos_base_item_download_async (item, NULL, photos_application_set_desktop_bg_download, g_object_ref (self));
 }
 
 
@@ -695,7 +695,7 @@ photos_application_window_mode_changed (PhotosApplication *self, PhotosWindowMod
   g_simple_action_set_enabled (priv->open_action, enable);
   g_simple_action_set_enabled (priv->print_action, enable);
   g_simple_action_set_enabled (priv->properties_action, enable);
-  g_simple_action_set_enabled (priv->set_bg_action, enable);
+  g_simple_action_set_enabled (priv->set_desktop_bg_action, enable);
 }
 
 
@@ -925,9 +925,9 @@ photos_application_startup (GApplication *application)
   priv->sel_none_action = g_simple_action_new ("select-none", NULL);
   g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (priv->sel_none_action));
 
-  priv->set_bg_action = g_simple_action_new ("set-background", NULL);
-  g_signal_connect_swapped (priv->set_bg_action, "activate", G_CALLBACK (photos_application_set_bg), self);
-  g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (priv->set_bg_action));
+  priv->set_desktop_bg_action = g_simple_action_new ("set-desktop-background", NULL);
+  g_signal_connect_swapped (priv->set_desktop_bg_action, "activate", G_CALLBACK (photos_application_set_desktop_bg), self);
+  g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (priv->set_desktop_bg_action));
 
   g_signal_connect_swapped (priv->mode_cntrlr,
                             "window-mode-changed",
@@ -996,7 +996,7 @@ photos_application_dispose (GObject *object)
   g_clear_object (&priv->search_action);
   g_clear_object (&priv->sel_all_action);
   g_clear_object (&priv->sel_none_action);
-  g_clear_object (&priv->set_bg_action);
+  g_clear_object (&priv->set_desktop_bg_action);
   g_clear_object (&priv->camera_cache);
   g_clear_object (&priv->mode_cntrlr);
   g_clear_object (&priv->extract_priority);
