@@ -387,10 +387,9 @@ photos_preview_view_set_node (PhotosPreviewView *self, GeglNode *node)
     {
       priv->node = g_object_ref (node);
 
-      photos_preview_view_scale_and_align_image (self, view);
-
       /* Steals the reference to the GeglNode. */
       gegl_gtk_view_set_node (GEGL_GTK_VIEW (view), g_object_ref (priv->node));
+      photos_preview_view_scale_and_align_image (self, view);
       gtk_widget_queue_draw (view);
     }
 }
