@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4 -I libgd ${ACLOCAL_FLAGS}
 
-SUBDIRS = . data libgd src po tests help
+SUBDIRS = . data libgd src po help
 
 INTLTOOL_FILES = \
 	intltool-extract.in \
@@ -63,6 +63,10 @@ GITIGNOREFILES = \
 	m4/libtool.m4 \
 	m4/lt* \
 	$(NULL)
+
+@BEHAVE_INSTALLED_TESTS_RULE@
+INSTALLED_TESTS=basic
+INSTALLED_TESTS_TYPE=session-exclusive
 
 AUTHORS:
 	@if test -d "$(srcdir)/.git"; \
