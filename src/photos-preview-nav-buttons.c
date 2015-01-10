@@ -309,6 +309,7 @@ photos_preview_nav_buttons_constructed (GObject *object)
 {
   PhotosPreviewNavButtons *self = PHOTOS_PREVIEW_NAV_BUTTONS (object);
   PhotosPreviewNavButtonsPrivate *priv = self->priv;
+  AtkObject *accessible;
   GtkStyleContext *context;
   GtkWidget *button;
   GtkWidget *image;
@@ -327,6 +328,11 @@ photos_preview_nav_buttons_constructed (GObject *object)
   gtk_image_set_pixel_size (GTK_IMAGE (image), 16);
 
   button = gtk_button_new ();
+  accessible = gtk_widget_get_accessible (button);
+  if (accessible) {
+    atk_object_set_name (accessible, _("Preview Previous"));
+    atk_object_set_role (accessible, ATK_ROLE_PUSH_BUTTON);
+  }
   gtk_button_set_image (GTK_BUTTON (button), image);
   context = gtk_widget_get_style_context (button);
   gtk_style_context_add_class (context, "osd");
@@ -356,6 +362,11 @@ photos_preview_nav_buttons_constructed (GObject *object)
   gtk_image_set_pixel_size (GTK_IMAGE (image), 16);
 
   button = gtk_button_new ();
+  accessible = gtk_widget_get_accessible (button);
+  if (accessible) {
+    atk_object_set_name (accessible, _("Preview Next"));
+    atk_object_set_role (accessible, ATK_ROLE_PUSH_BUTTON);
+  }
   gtk_button_set_image (GTK_BUTTON (button), image);
   context = gtk_widget_get_style_context (button);
   gtk_style_context_add_class (context, "osd");

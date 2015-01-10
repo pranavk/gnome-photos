@@ -156,11 +156,17 @@ static GtkWidget *
 photos_main_toolbar_add_back_button (PhotosMainToolbar *self)
 {
   PhotosMainToolbarPrivate *priv = self->priv;
+  AtkObject *accessible;
   GtkWidget *back_button;
 
   back_button = gtk_button_new_from_icon_name (PHOTOS_ICON_GO_PREVIOUS_SYMBOLIC, GTK_ICON_SIZE_BUTTON);
   gtk_widget_set_tooltip_text (back_button, _("Back"));
   gtk_header_bar_pack_start (GTK_HEADER_BAR (priv->toolbar), back_button);
+  accessible = gtk_widget_get_accessible (back_button);
+  if (accessible) {
+    atk_object_set_name (accessible, _("Back"));
+    atk_object_set_role (accessible, ATK_ROLE_PUSH_BUTTON);
+  }
 
   return back_button;
 }
@@ -280,6 +286,7 @@ photos_main_toolbar_add_remote_display_button (PhotosMainToolbar *self)
 static GtkWidget *
 photos_main_toolbar_add_search_button (PhotosMainToolbar *self)
 {
+  AtkObject *accessible;
   GtkWidget *image;
   GtkWidget *search_button;
 
@@ -289,6 +296,11 @@ photos_main_toolbar_add_search_button (PhotosMainToolbar *self)
   gtk_button_set_image (GTK_BUTTON (search_button), image);
   gtk_actionable_set_action_name (GTK_ACTIONABLE (search_button), "app.search");
   gtk_header_bar_pack_end (GTK_HEADER_BAR (self->priv->toolbar), search_button);
+  accessible = gtk_widget_get_accessible (search_button);
+  if (accessible) {
+    atk_object_set_name (accessible, _("Search"));
+    atk_object_set_role (accessible, ATK_ROLE_TOGGLE_BUTTON);
+  }
 
   return search_button;
 }
@@ -298,11 +310,18 @@ static GtkWidget *
 photos_main_toolbar_add_selection_button (PhotosMainToolbar *self)
 {
   PhotosMainToolbarPrivate *priv = self->priv;
+  AtkObject *accessible;
   GtkWidget *selection_button;
 
   selection_button = gtk_button_new_from_icon_name (PHOTOS_ICON_OBJECT_SELECT_SYMBOLIC, GTK_ICON_SIZE_BUTTON);
   gtk_widget_set_tooltip_text (selection_button, _("Select Items"));
   gtk_header_bar_pack_end (GTK_HEADER_BAR (priv->toolbar), selection_button);
+  accessible = gtk_widget_get_accessible (selection_button);
+  if (accessible) {
+    atk_object_set_name (accessible, _("Select Items"));
+    atk_object_set_role (accessible, ATK_ROLE_PUSH_BUTTON);
+  }
+
   g_signal_connect_swapped (selection_button,
                             "clicked",
                             G_CALLBACK (photos_main_toolbar_select_button_clicked),
@@ -567,6 +586,7 @@ static void
 photos_main_toolbar_populate_for_preview (PhotosMainToolbar *self)
 {
   PhotosMainToolbarPrivate *priv = self->priv;
+  AtkObject *accessible;
   GMenu *preview_menu;
   GtkWidget *back_button;
   GtkWidget *image;
@@ -586,6 +606,11 @@ photos_main_toolbar_populate_for_preview (PhotosMainToolbar *self)
   preview_menu = photos_main_toolbar_create_preview_menu (self);
   image = gtk_image_new_from_icon_name (PHOTOS_ICON_SYSTEM_SYMBOLIC, GTK_ICON_SIZE_BUTTON);
   menu_button = gtk_menu_button_new ();
+  accessible = gtk_widget_get_accessible (menu_button);
+  if (accessible) {
+    atk_object_set_name (accessible, _("Gear menu"));
+    atk_object_set_role (accessible, ATK_ROLE_PUSH_BUTTON);
+  }
   gtk_actionable_set_action_name (GTK_ACTIONABLE (menu_button), "app.gear-menu");
   gtk_button_set_image (GTK_BUTTON (menu_button), image);
   gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (menu_button), G_MENU_MODEL (preview_menu));
@@ -595,6 +620,11 @@ photos_main_toolbar_populate_for_preview (PhotosMainToolbar *self)
 
   image = gtk_image_new_from_icon_name (PHOTOS_ICON_FAVORITE_SYMBOLIC, GTK_ICON_SIZE_BUTTON);
   priv->favorite_button = gtk_toggle_button_new ();
+  accessible = gtk_widget_get_accessible (priv->favorite_button);
+  if (accessible) {
+    atk_object_set_name (accessible, _("Favorite toggle"));
+    atk_object_set_role (accessible, ATK_ROLE_TOGGLE_BUTTON);
+  }
   gtk_button_set_image (GTK_BUTTON (priv->favorite_button), image);
   gtk_header_bar_pack_end (GTK_HEADER_BAR (priv->toolbar), priv->favorite_button);
   g_signal_connect_swapped (priv->favorite_button,
@@ -644,11 +674,17 @@ static void
 photos_main_toolbar_populate_for_selection_mode (PhotosMainToolbar *self)
 {
   PhotosMainToolbarPrivate *priv = self->priv;
+  AtkObject *accessible;
   GtkWidget *selection_button;
 
   photos_header_bar_set_mode (PHOTOS_HEADER_BAR (priv->toolbar), PHOTOS_HEADER_BAR_MODE_SELECTION);
 
   selection_button = gtk_button_new_with_label (_("Cancel"));
+  accessible = gtk_widget_get_accessible (selection_button);
+  if (accessible) {
+    atk_object_set_name (accessible, _("Cancel Selection"));
+    atk_object_set_role (accessible, ATK_ROLE_PUSH_BUTTON);
+  }
   gtk_header_bar_pack_end (GTK_HEADER_BAR (priv->toolbar), selection_button);
   g_signal_connect_swapped (selection_button,
                             "clicked",
@@ -747,6 +783,7 @@ static void
 photos_main_toolbar_init (PhotosMainToolbar *self)
 {
   PhotosMainToolbarPrivate *priv;
+  AtkObject *accessible;
   GMenu *selection_menu;
   GApplication *app;
   GtkBuilder *builder;
@@ -773,6 +810,11 @@ photos_main_toolbar_init (PhotosMainToolbar *self)
 
   selection_menu = G_MENU (gtk_builder_get_object (builder, "selection-menu"));
   priv->selection_menu = gtk_menu_button_new ();
+  accessible = gtk_widget_get_accessible (priv->selection_menu);
+  if (accessible) {
+    atk_object_set_name (accessible, _("Selection Menu"));
+    atk_object_set_role (accessible, ATK_ROLE_PUSH_BUTTON);
+  }
   gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (priv->selection_menu), G_MENU_MODEL (selection_menu));
   g_object_unref (builder);
 

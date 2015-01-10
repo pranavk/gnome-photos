@@ -429,6 +429,7 @@ static void
 photos_selection_toolbar_init (PhotosSelectionToolbar *self)
 {
   PhotosSelectionToolbarPrivate *priv;
+  AtkObject *accessible;
   GApplication *app;
   GtkWidget *image;
   GtkWidget *toolbar;
@@ -447,6 +448,11 @@ photos_selection_toolbar_init (PhotosSelectionToolbar *self)
 
   image = gtk_image_new_from_icon_name (PHOTOS_ICON_FAVORITE_SYMBOLIC, GTK_ICON_SIZE_BUTTON);
   priv->toolbar_favorite = gtk_toggle_button_new ();
+  accessible = gtk_widget_get_accessible (priv->toolbar_favorite);
+  if (accessible) {
+    atk_object_set_name (accessible, _("Add/Remove from favorites"));
+    atk_object_set_role (accessible, ATK_ROLE_TOGGLE_BUTTON);
+  }
   gtk_button_set_image (GTK_BUTTON (priv->toolbar_favorite), image);
   gtk_action_bar_pack_start (GTK_ACTION_BAR (toolbar), priv->toolbar_favorite);
   g_signal_connect (priv->toolbar_favorite,
@@ -455,6 +461,11 @@ photos_selection_toolbar_init (PhotosSelectionToolbar *self)
                     self);
 
   priv->toolbar_open = gtk_button_new_with_label (_("Open"));
+  accessible = gtk_widget_get_accessible (priv->toolbar_open);
+  if (accessible) {
+    atk_object_set_name (accessible, _("Open with"));
+    atk_object_set_role (accessible, ATK_ROLE_PUSH_BUTTON);
+  }
   gtk_action_bar_pack_start (GTK_ACTION_BAR (toolbar), priv->toolbar_open);
   g_signal_connect (priv->toolbar_open,
                     "clicked",
