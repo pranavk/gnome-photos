@@ -15,6 +15,11 @@ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 AM_INIT_AUTOMAKE([dist-xz no-dist-gzip serial-tests tar-ustar])
 AM_MAINTAINER_MODE([enable])
 
+AX_IS_RELEASE([git-directory])
+
+AX_CHECK_ENABLE_DEBUG(,[ENABLE_DEBUG],,[$ax_is_release])
+AX_COMPILER_FLAGS([WARN_CFLAGS], [WARN_LDFLAGS], [$ax_is_release])
+
 AC_PROG_CC
 AC_PROG_CC_C_O
 AC_HEADER_STDC
@@ -35,10 +40,7 @@ GTK_MIN_VERSION=3.15.5
 LIBEXIF_MIN_VERSION=0.6.14
 LIBRSVG_MIN_VERSION=2.26.0
 
-GNOME_COMPILE_WARNINGS([maximum])
-GNOME_DEBUG_CHECK
-GNOME_MAINTAINER_MODE_DEFINES
-
+AX_REQUIRE_DEFINED([IT_PROG_INTLTOOL])
 IT_PROG_INTLTOOL([0.50.1])
 
 GETTEXT_PACKAGE=AC_PACKAGE_TARNAME
@@ -111,6 +113,7 @@ PKG_CHECK_MODULES(LIBEXIF, [libexif >= $LIBEXIF_MIN_VERSION])
 PKG_CHECK_MODULES(LIBRSVG, [librsvg-2.0 >= $LIBRSVG_MIN_VERSION])
 PKG_CHECK_MODULES(TRACKER, [tracker-control-1.0 tracker-sparql-1.0])
 
+AX_REQUIRE_DEFINED([LIBGD_INIT])
 LIBGD_INIT([
   gtk-hacks
   main-icon-view
@@ -126,6 +129,7 @@ AC_ARG_ENABLE(dogtail,
               enable_dogtail=yes)
 AM_CONDITIONAL(ENABLE_DOGTAIL, test "$enable_dogtail" != no)
 
+AX_REQUIRE_DEFINED([GLIB_TESTS])
 GLIB_TESTS
 
 GLIB_COMPILE_RESOURCES=`$PKG_CONFIG --variable glib_compile_resources gio-2.0`
@@ -141,6 +145,7 @@ fi
 #Documentation
 #############################################
 
+AX_REQUIRE_DEFINED([YELP_HELP_INIT])
 YELP_HELP_INIT
 
 AC_CONFIG_FILES([
